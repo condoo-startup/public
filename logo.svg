@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2F74B8"/>
+      <stop offset="100%" stop-color="#1F5E9F"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer house/frame -->
+  <path d="
+    M 300 730
+    L 300 450
+    Q 300 435 312 428
+    L 530 300
+    Q 550 288 570 300
+    L 710 380
+    Q 730 392 730 415
+    L 730 720
+    Q 730 748 705 748
+    L 320 748
+    Q 300 748 300 730
+    Z
+  " fill="none" stroke="url(#blueGrad)" stroke-width="40" stroke-linejoin="round"/>
+
+  <!-- Left inner pillar -->
+  <rect x="315" y="445" width="85" height="265" fill="none" stroke="url(#blueGrad)" stroke-width="40"/>
+
+  <!-- Circular element -->
+  <circle cx="565" cy="515" r="57" fill="none" stroke="url(#blueGrad)" stroke-width="40"/>
+</svg>
