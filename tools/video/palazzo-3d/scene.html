@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8">
+<style>
+@font-face{font-family:J;font-weight:500;src:url(plus-jakarta-sans-latin-500-normal.woff2)}
+@font-face{font-family:J;font-weight:700;src:url(plus-jakarta-sans-latin-700-normal.woff2)}
+@font-face{font-family:J;font-weight:800;src:url(plus-jakarta-sans-latin-800-normal.woff2)}
+html,body{margin:0;width:540px;height:960px;overflow:hidden;background:#1F2F4A;font-family:J,sans-serif}
+canvas{position:absolute;left:0;top:0}
+#cap{position:absolute;left:28px;right:28px;top:64px;color:#fff;font-weight:800;font-size:40px;letter-spacing:-0.045em;line-height:1.02;text-shadow:0 2px 18px rgba(14,26,44,.45)}
+#cap small{display:block;font-size:19px;font-weight:600;letter-spacing:-0.01em;margin-top:10px;opacity:.92}
+#logo{position:absolute;left:28px;top:24px;height:20px}
+.card{position:absolute;left:28px;width:300px;background:#fff;border-radius:16px;padding:16px 18px;box-sizing:border-box;box-shadow:0 24px 50px -18px rgba(14,26,44,.55);opacity:0}
+.card .k{font-size:13px;font-weight:700;color:#2F6FE5}
+.card .t{font-size:22px;font-weight:800;color:#16243B;letter-spacing:-0.03em;margin-top:4px;line-height:1.1}
+.card .r{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.card .e{font-size:11px;color:#8A93A3}
+.pill{display:inline-block;border-radius:6px;padding:4px 10px;font-size:13px;font-weight:700}
+#dot{position:absolute;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:#2F6FE5;box-shadow:0 0 0 4px #fff;opacity:0}
+svg#ln{position:absolute;left:0;top:0;pointer-events:none}
+#end{position:absolute;inset:0;background:#1F2F4A;opacity:0;display:flex;flex-direction:column;justify-content:center;padding:0 40px}
+#end img{height:34px;width:auto;align-self:flex-start}
+#end h2{color:#fff;font-size:40px;font-weight:800;letter-spacing:-0.045em;line-height:1.02;margin:26px 0 30px}
+#end .cta{align-self:flex-start;background:#2F6FE5;color:#fff;border-radius:999px;padding:14px 26px;font-size:19px;font-weight:700}
+</style></head><body>
+<script src="three.min.js"></script>
+<svg id="ln" width="540" height="960"><line id="l" x1="0" y1="0" x2="0" y2="0" stroke="#fff" stroke-width="2.5" stroke-dasharray="5 5" opacity="0"/></svg>
+<img id="logo" src="condoo-wordmark-white.png">
+<div id="cap"></div>
+<div id="dot"></div>
+<div class="card" id="c0" style="top:640px"><div class="k">Calendario</div><div class="t">Manutenzione del tetto</div><div class="r"><span class="pill" style="background:#E7F6EE;color:#1F9D63">Manutenzione</span><span class="e">Esempio</span></div></div>
+<div class="card" id="c1" style="top:640px"><div class="k">Segnalazione</div><div class="t">Perdita in bagno</div><div class="r"><span class="pill" id="st"></span><span class="e">Esempio</span></div></div>
+<div class="card" id="c2" style="top:640px"><div class="k">Bacheca</div><div class="t">Avviso: manutenzione ascensore</div><div class="r"><span class="pill" style="background:#EAF1FE;color:#2F6FE5">Avviso</span><span class="e">Esempio</span></div></div>
+<div class="card" id="c3" style="top:640px"><div class="k">Documenti</div><div class="t">Verbale dell'ultima assemblea</div><div class="r"><span class="pill" style="background:#E4EAF2;color:#5A6982">Verbali</span><span class="e">Esempio</span></div></div>
+<div id="end"><img src="condoo-wordmark-white.png"><h2>Tutto il palazzo,<br>in un'app che si apre dal browser.</h2><div class="cta">Registrati gratis su condoo.eu</div></div>
+<script>
+const W=540,H=960;
+const R=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
+R.setPixelRatio(2);R.setSize(W,H);R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;
+document.body.insertBefore(R.domElement,document.body.firstChild);
+const S=new THREE.Scene();
+const cam=new THREE.PerspectiveCamera(38,W/H,0.1,400);
+const hemi=new THREE.HemisphereLight(0xdfeaff,0x8a7a66,1.0);S.add(hemi);
+const sun=new THREE.DirectionalLight(0xfff1dc,2.2);sun.position.set(-18,30,22);sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-25,right:25,top:30,bottom:-10,near:1,far:90});S.add(sun);
+const M=(c,o={})=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.85},o));
+function box(w,h,d,m,x,y,z,sh=true){const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);b.position.set(x,y,z);b.castShadow=sh;b.receiveShadow=true;S.add(b);return b}
+// ground
+const g=new THREE.Mesh(new THREE.PlaneGeometry(300,300),M(0xC9D6E6));g.rotation.x=-Math.PI/2;g.receiveShadow=true;S.add(g);
+box(40,.1,4,M(0xE3E9F1),0,.05,7.5,false);box(60,.06,8,M(0x56607A),0,.03,13.5,false);
+for(let i=-28;i<30;i+=6)box(2.6,.07,.25,M(0xF2F4F7),i,.06,13.5,false);
+// building
+const FL=3.2,NF=5,BW=12,BD=9,BH=FL*NF;
+const plaster=M(0xEDE5D8),trim=M(0x1F2F4A),base=M(0x3A4A66);
+box(BW,BH,BD,plaster,0,BH/2,0);
+box(BW+.3,FL*.95,BD+.3,base,0,FL*.95/2,0);
+for(let f=1;f<=NF;f++)box(BW+.25,.18,BD+.25,trim,0,f*FL,0);
+// roof
+box(BW+.4,.9,.3,plaster,0,BH+.45,BD/2);box(BW+.4,.9,.3,plaster,0,BH+.45,-BD/2);box(.3,.9,BD,plaster,BW/2,BH+.45,0);box(.3,.9,BD,plaster,-BW/2,BH+.45,0);
+box(3,2,2.6,plaster,-3,BH+1,-2);const ant=box(.12,3.2,.12,trim,3.4,BH+1.6,-2.4);box(1.6,.1,.1,trim,3.4,BH+2.8,-2.4);
+// windows
+const wins=[];const glass=()=>M(0x9DB6DA,{roughness:.25,metalness:.1,emissive:0x000000});
+function win(x,y,z,face){const m=glass();const fr=face==='f'?box(1.7,2.0,.12,trim,x,y,z):box(.12,2.0,1.7,trim,x,y,z);
+ const gl=face==='f'?box(1.45,1.75,.14,m,x,y,z+.01,false):box(.14,1.75,1.45,m,x+.01,y,z,false);wins.push({m,x,y,z,face});return gl}
+for(let f=1;f<NF;f++){const y=f*FL+1.65;
+ for(const x of [-4.5,-1.5,1.5,4.5])win(x,y,BD/2+.02,'f');
+ for(const z of [-3,0,3])win(BW/2+.02,y,z,'s');
+ // balconies front
+ for(const x of [-3,3]){box(2.9,.16,1.2,plaster,x,f*FL+.25,BD/2+.6);box(2.9,.8,.06,trim,x,f*FL+.65,BD/2+1.17);box(.06,.8,1.2,trim,x-1.42,f*FL+.65,BD/2+.6);box(.06,.8,1.2,trim,x+1.42,f*FL+.65,BD/2+.6);}
+}
+// ground floor: door + shop windows
+const doorM=M(0x2F6FE5,{roughness:.5});box(2.1,2.6,.15,doorM,0,1.3,BD/2+.12);box(3.2,.14,1.4,trim,0,2.95,BD/2+.7);
+const doorGlass=M(0xBFD3F2,{emissive:0x000000});box(.8,1.4,.17,doorGlass,0,1.6,BD/2+.13,false);
+for(const x of [-4,4])win(x,1.6,BD/2+.17,'f');
+// trees + lamps
+function tree(x,z,s){box(.3,1.6*s,.3,M(0x7A5A3A),x,.8*s,z);const c=new THREE.Mesh(new THREE.IcosahedronGeometry(1.3*s,0),M(0x3FA37E,{flatShading:true}));c.position.set(x,1.6*s+1*s,z);c.castShadow=true;S.add(c)}
+tree(-8.5,7.6,1.1);tree(8.8,7.4,1.25);tree(-11,4,1);tree(12,1,1.15);
+const lampM=M(0xFFE7B0,{emissive:0x000000});box(.12,3.6,.12,trim,-6.2,1.8,8.8);box(.5,.3,.5,lampM,-6.2,3.7,8.8);
+// neighbours
+function bldg(x,z,w,h,d,c){box(w,h,d,M(c),x,h/2,z)}
+bldg(-17,-2,8,11,9,0xD6DEEA);bldg(17,-1,8,13.5,9,0xDCD3C4);bldg(-6,-16,30,9,8,0xC7D2E2);
+// anchors (world points)
+const A={roof:[-3,BH+2.2,-2],leak:[-4.5,3*FL+1.65,BD/2+.1],door:[0,2.2,BD/2+.3],doc:[4.5,FL*4+1.65,BD/2+.1]};
+// camera keyframes: [t, pos, target]
+const KF=[[0,[34,9,42],[0,8,0]],[2.8,[26,14,34],[0,9,0]],[4.6,[12,25,24],[-2,17,-1]],[8.0,[10,26,21],[-2,17,-1]],[9.4,[-14,12,20],[-4.5,10.5,4]],[11.9,[-13,12.5,19],[-4.5,10.5,4]],[13.0,[6,3.2,19],[0,3,4]],[14.9,[6,3.4,18],[0,3,4]],[16.0,[16,15,20],[4.5,14.5,4]],[17.8,[17,15.5,21],[4.5,14.5,4]],[19.5,[30,12,40],[0,8,0]],[23,[32,12,44],[0,8,0]]];
+const sm=x=>x*x*(3-2*x);
+function camAt(t){let i=0;while(i<KF.length-2&&t>KF[i+1][0])i++;const [t0,p0,q0]=KF[i],[t1,p1,q1]=KF[i+1];const u=sm(Math.min(1,Math.max(0,(t-t0)/(t1-t0))));
+ const L=(a,b)=>a.map((v,k)=>v+(b[k]-v)*u);return [L(p0,p1),L(q0,q1)]}
+const lerpC=(a,b,u)=>new THREE.Color(a).lerp(new THREE.Color(b),u);
+const $=id=>document.getElementById(id);
+const fadeIn=(t,a,b,fd=.35)=>Math.max(0,Math.min(1,(t-a)/fd,(b-t)/fd));
+function render(t){
+ const [p,q]=camAt(t);cam.position.set(...p);cam.lookAt(...q);
+ const dusk=sm(Math.min(1,Math.max(0,(t-13.5)/4)));
+ S.background=lerpC(0x9CC3F0,0x1F2F4A,dusk);S.fog=new THREE.Fog(S.background,70,160);
+ sun.intensity=2.2*(1-dusk*.75);hemi.intensity=1.0-dusk*.55;sun.color=lerpC(0xfff1dc,0xffc890,dusk);
+ wins.forEach((w,i)=>{const on=dusk>0&&((i*37)%11)/11<dusk*1.1;w.m.emissive.set(on?((i%3)?0xE8A33D:0x6FA0F2):0x000000);w.m.emissiveIntensity=on?1.1:0});
+ lampM.emissive.set(dusk>.3?0xFFD27A:0x000000);doorGlass.emissive.set(dusk>.3?0xE8A33D:0x000000);
+ // leak window pulse
+ const lw=wins.find(w=>w.x===-4.5&&Math.abs(w.y-(3*FL+1.65))<.01&&w.face==='f');
+ if(t>8.8&&t<12.2){const pu=(Math.sin(t*6)+1)/2;lw.m.emissive.set(0x2F6FE5);lw.m.emissiveIntensity=.4+pu*.6}
+ R.render(S,cam);
+ // captions
+ let cap='';
+ if(t<5)cap='Un palazzo.<small>E tutto quello che chi ci abita deve sapere.</small>';
+ else if(t<18.6)cap=t<15.2?'':'Tutto il palazzo,<br>in Condoo.';
+ $('cap').innerHTML=cap;
+ // cards
+ const seg=[['c0','roof',4.7,8.2],['c1','leak',9.3,12.0],['c2','door',12.9,15.0],['c3','doc',15.9,18.6]];
+ let act=null;
+ for(const [id,a,s,e] of seg){const o=fadeIn(t,s,e);$(id).style.opacity=o;$(id).style.transform=`translateY(${(1-o)*14}px)`;if(o>0)act=[id,a,o]}
+ const dot=$('dot'),ln=$('l');
+ if(act){const v=new THREE.Vector3(...A[act[1]]).project(cam);const x=(v.x+1)/2*W,y=(1-v.y)/2*H;
+  dot.style.left=x+'px';dot.style.top=y+'px';dot.style.opacity=act[2];
+  const c=$(act[0]);ln.setAttribute('x1',x);ln.setAttribute('y1',y);ln.setAttribute('x2',178);ln.setAttribute('y2',640);ln.setAttribute('opacity',act[2]);
+  dot.style.transform=`scale(${1+.25*Math.sin(t*6)})`}
+ else{dot.style.opacity=0;ln.setAttribute('opacity',0)}
+ const s=$('st');const ss=t<10.2?['Aperta','#EAF1FE','#2F6FE5']:t<11.1?['In lavorazione','#FBEBCB','#9A6A12']:['Risolta','#E7F6EE','#1F9D63'];
+ s.textContent=ss[0];s.style.background=ss[1];s.style.color=ss[2];
+ $('end').style.opacity=Math.max(0,Math.min(1,(t-19.0)/.5));
+ $('logo').style.opacity=1-Math.max(0,Math.min(1,(t-19.0)/.5));
+}
+window.render=render;
+</script></body></html>
